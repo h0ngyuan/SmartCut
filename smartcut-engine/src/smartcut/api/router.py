@@ -8,13 +8,13 @@ router = APIRouter(prefix="/api")
 
 
 @router.get("/health", response_model=HealthResponse)
-async def health():
+async def health() -> HealthResponse:
     """Health check endpoint."""
     return HealthResponse()
 
 
 @router.post("/task", response_model=TaskResponse)
-async def submit_task(request: TaskRequest):
+async def submit_task(request: TaskRequest) -> TaskResponse:
     """Submit a video editing task.
 
     This is a stub — business logic will be added in the services layer.
