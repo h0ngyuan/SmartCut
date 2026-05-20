@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  java:
+    name: Java (smartcut-gui)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: smartcut-gui
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Run Checkstyle
+        run: mvn checkstyle:check
+
+      - name: Run Tests
+        run: mvn test
+
+      - name: Run Jacoco Coverage Check
+        run: mvn jacoco:check
+
+  python:
+    name: Python (smartcut-engine)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: smartcut-engine
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Run Ruff
+        run: poetry run ruff check src/ tests/
+
+      - name: Run Mypy
+        run: poetry run mypy src/
+
+      - name: Run Tests with Coverage
+        run: poetry run pytest tests/ --cov=src/smartcut --cov-fail-under=80
